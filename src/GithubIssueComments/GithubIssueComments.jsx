@@ -29,12 +29,10 @@ const GithubIssueComments = ({ issueUri }) => {
       });
   }, [issueUri]);
 
-  return (
-    <section className="githubissuecomments-container">
-      <h1>Comments</h1>
-
-      {commentsHaveLoaded ? (
-        comments.length > 0 ? (
+  if (commentsHaveLoaded) {
+    return (
+      <section className="GithubIssueComments-container">
+        {comments.length > 0 ? (
           comments.map(comment => (
             <Comment
               body={comment.body}
@@ -44,33 +42,46 @@ const GithubIssueComments = ({ issueUri }) => {
           ))
         ) : (
           <p>No comments found!</p>
-        )
-      ) : (
+        )}
+        <a
+          className="GithubIssueComments-comment-button"
+          href={`https://github.com/${issueUri}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Comment via Github
+        </a>
+      </section>
+    );
+  } else {
+    return (
+      <section className="GithubIssueComments-container">
         <p>Loading comments...</p>
-      )}
-    </section>
-  );
+      </section>
+    );
+  }
 };
 
 const Comment = ({ body, user, createdAt }) => (
-  <div className="githubissuecomments-comment">
-    <div className="githubissuecomment-comment-header">
-      <img src={user.avatarUrl} alt={`Avatar of ${user.username}`} />
-      <b
+  <div className="GithubIssueComments-comment">
+    <img src={user.avatarUrl} alt={`Avatar of ${user.username}`} />
+
+    <div className="GithubIssueComments-comment-box">
+      <div
         className={
           user.isRepositoryOwner
-            ? "githubissuecomment-comment-user githubissuecomment-comment-user-isOwner"
-            : "githubissuecomment-comment-user"
+            ? "GithubIssueComments-comment-box-header GithubIssueComments-comment-box-header-isOwner"
+            : "GithubIssueComments-comment-box-header"
         }
       >
-        {user.username}
-      </b>
-    </div>
-    <div className="githubissuecomment-comment-body">
-      <p>{body}</p>
-    </div>
-    <div className="githubissuecomment-comment-createdAt">
-      <p>{new Date(createdAt).toLocaleString()}</p>
+        <b className="GithubIssueComments-comment-box-header-username">
+          {user.username}
+          <span> commented on {new Date(createdAt).toLocaleDateString()}</span>
+        </b>
+      </div>
+      <div className="GithubIssueComments-comment-box-body">
+        <p>{body}</p>
+      </div>
     </div>
   </div>
 );
