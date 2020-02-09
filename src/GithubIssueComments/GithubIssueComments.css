@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 800px;
   font-size: 0.8em;
 }
 
@@ -22,11 +21,24 @@
 }
 
 /*Comment Profile Avatar*/
-.GithubIssueComments-comment > img {
-  width: 40px;
-  height: 40px;
+.GithubIssueComments-comment-user-avatar {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+@media (min-width: 480px) {
+  .GithubIssueComments-comment-user-avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+}
+
+.GithubIssueComments-comment-user-avatar > img {
+  width: 100%;
+  height: 100%;
   border-radius: 3px;
-  margin-right: 10px;
 }
 
 /*Comment Box*/
@@ -35,6 +47,7 @@
   border-radius: 3px;
   color: #24292e;
   width: 100%;
+  overflow: hidden;
 }
 
 /*Comment Box Header*/
@@ -64,20 +77,34 @@
 /*Comment Box Body*/
 .GithubIssueComments-comment-box-body {
   background-color: #ffffff;
-  padding: 0.5rem;
+  padding: 0.8rem;
 }
 
 .GithubIssueComments-comment-box-body > p {
   overflow-wrap: break-word;
 }
 
+.GithubIssueComments-comment-box-body > p > blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+.GithubIssueComments-comment-box-body > p pre,
+code {
+  overflow-x: auto;
+}
+
 /*Comment Button*/
-.GithubIssueComments-comment-button {
+.GithubIssueComments-new-comment-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 12rem;
-  height: 2.5rem;
+  min-width: 12rem;
+  min-height: 2.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   margin: 0 auto;
   margin-top: 10px;
   border-radius: 3px;
@@ -86,4 +113,72 @@
   text-align: center;
   font-weight: bold;
   text-decoration: none;
+}
+
+/*Loading Icon Animation*/
+.GithubIssueComments-loading-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #6a737d;
+  margin: 0 auto;
+  margin-top: 30px;
+  -webkit-animation: sk-rotateplane 1.5s infinite ease-in-out;
+  animation: sk-rotateplane 1.5s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-rotateplane {
+  0% {
+    -webkit-transform: perspective(120px);
+  }
+  50% {
+    -webkit-transform: perspective(120px) rotateY(180deg);
+  }
+  100% {
+    -webkit-transform: perspective(120px) rotateY(180deg) rotateX(180deg);
+  }
+}
+
+@keyframes sk-rotateplane {
+  0% {
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+  }
+}
+
+/*No Comments Found*/
+.GithubIssueComments-no-comments-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/*Show Comments Button*/
+.GithubIssueComments-show-comments-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 12rem;
+  height: 2.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border: 1px solid #586069;
+  border-radius: 3px;
+  background-color: #fff;
+  color: #586069;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.GithubIssueComments-show-comments-button:hover {
+  background-color: #586069;
+  color: #fff;
 }
