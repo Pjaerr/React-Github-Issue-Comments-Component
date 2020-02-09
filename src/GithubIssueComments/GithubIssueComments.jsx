@@ -9,14 +9,19 @@ const GithubIssueComments = ({ issueUri }) => {
   useEffect(() => {
     const url = `https://api.github.com/repos/${issueUri}/comments`;
 
-    fetch(url)
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.github.v3.html+json"
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setCommentsHaveLoaded(true);
         setComments(
           data.map(comment => {
             return {
-              body: comment.body,
+              body: { __html: comment["body_html"] },
               user: {
                 username: comment.user.login,
                 avatarUrl: comment.user["avatar_url"],
@@ -27,6 +32,41 @@ const GithubIssueComments = ({ issueUri }) => {
           })
         );
       });
+
+    //If the v4 GraphQL API ever supports unauthenticated requests
+    // fetch("https://api.github.com/graphql", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/vnd.github.v4+json"
+    //   },
+    //   body: JSON.stringify({
+    //     query: `query {
+    //       repository(owner: "pjaerr", name:"Findr") {
+    //         issue(number: 6) {
+    //           comments (last: 5) {
+    //             edges {
+    //               node {
+    //                 id
+    //                 author{
+    //                   login
+    //                   avatarUrl
+    //                 }
+    //                 authorAssociation
+    //                 createdAt
+    //                 bodyHTML
+    //               }
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }`
+    //   })
+    // })
+    //   .then(res => res.json())
+    //   .then(res => {
+    //     console.log(res.data);
+    //   });
   }, [issueUri]);
 
   if (commentsHaveLoaded) {
@@ -80,7 +120,7 @@ const Comment = ({ body, user, createdAt }) => (
         </b>
       </div>
       <div className="GithubIssueComments-comment-box-body">
-        <p>{body}</p>
+        <p dangerouslySetInnerHTML={body}></p>
       </div>
     </div>
   </div>
