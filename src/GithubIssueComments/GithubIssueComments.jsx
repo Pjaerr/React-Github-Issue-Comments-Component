@@ -32,41 +32,6 @@ const GithubIssueComments = ({ issueUri }) => {
           })
         );
       });
-
-    //If the v4 GraphQL API ever supports unauthenticated requests
-    // fetch("https://api.github.com/graphql", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Accept: "application/vnd.github.v4+json"
-    //   },
-    //   body: JSON.stringify({
-    //     query: `query {
-    //       repository(owner: "pjaerr", name:"Findr") {
-    //         issue(number: 6) {
-    //           comments (last: 5) {
-    //             edges {
-    //               node {
-    //                 id
-    //                 author{
-    //                   login
-    //                   avatarUrl
-    //                 }
-    //                 authorAssociation
-    //                 createdAt
-    //                 bodyHTML
-    //               }
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }`
-    //   })
-    // })
-    //   .then(res => res.json())
-    //   .then(res => {
-    //     console.log(res.data);
-    //   });
   }, [issueUri]);
 
   if (commentsHaveLoaded) {
