@@ -182,3 +182,26 @@ code {
   background-color: #586069;
   color: #fff;
 }
+
+/*Refresh Comments Button*/
+.GithubIssueComments-refresh-comments-button {
+  border: none;
+  background: none;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #586069;
+  text-decoration: underline;
+  font-size: 0.8em;
+}
+
+.GithubIssueComments-refresh-comments-button:hover {
+  cursor: pointer;
+}
+
+.GithubIssueComments-refresh-comments-button:disabled {
+  text-decoration: none;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0.2;
+}

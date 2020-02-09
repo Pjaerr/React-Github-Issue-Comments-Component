@@ -36,7 +36,7 @@ const GithubIssueCommentsCore = ({ issueUri }) => {
   const [comments, setComments] = useState([]);
   const [commentsHaveLoaded, setCommentsHaveLoaded] = useState(false);
 
-  useEffect(() => {
+  const loadComments = () => {
     /*Make a GET request to the github API for comments at the provided IssueUri. Request that
     the comment body be formatted as HTML.*/
     fetch(`https://api.github.com/repos/${issueUri}/comments`, {
@@ -70,7 +70,9 @@ const GithubIssueCommentsCore = ({ issueUri }) => {
           console.error(`The issueUri: "${issueUri}" doesn't exist`);
         }
       });
-  }, [issueUri]);
+  };
+
+  useEffect(loadComments, [issueUri]);
 
   if (commentsHaveLoaded) {
     return (
@@ -87,6 +89,8 @@ const GithubIssueCommentsCore = ({ issueUri }) => {
         ) : (
           <NoCommentsFound />
         )}
+        <RefreshCommentsButton onRefresh={loadComments} />
+
         <NewCommentButton
           redirectUrl={`https://github.com/${issueUri}#issue-comment-box`}
         />
@@ -97,31 +101,28 @@ const GithubIssueCommentsCore = ({ issueUri }) => {
   return <LoadingComments />;
 };
 
-const NoCommentsFound = () => (
-  <p className="GithubIssueComments-no-comments-found">
-    No comments found{" "}
-    <span role="img" aria-label="Smiley Face Emoji">
-      🙁
-    </span>
-  </p>
-);
+/**
+ * Button component that calls a given `onRefresh()` function and disables itself for 1 second between
+ * button clicks.
+ * @param {() => void} onRefresh
+ */
+const RefreshCommentsButton = ({ onRefresh }) => {
+  const [allowCommentsRefresh, setAllowCommentsRefresh] = useState(false);
 
-const NewCommentButton = ({ redirectUrl }) => (
-  <a
-    className="GithubIssueComments-new-comment-button"
-    href={redirectUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Write a Comment via Github
-  </a>
-);
-
-const LoadingComments = () => (
-  <section className="GithubIssueComments-container">
-    <div className="GithubIssueComments-loading-icon"></div>
-  </section>
-);
+  return (
+    <button
+      className="GithubIssueComments-refresh-comments-button"
+      disabled={allowCommentsRefresh}
+      onClick={() => {
+        setAllowCommentsRefresh(true);
+        onRefresh();
+        setTimeout(() => setAllowCommentsRefresh(false), 1000);
+      }}
+    >
+      Check for new comments
+    </button>
+  );
+};
 
 const Comment = ({ body, user, createdAt }) => (
   <div className="GithubIssueComments-comment">
@@ -152,6 +153,32 @@ const Comment = ({ body, user, createdAt }) => (
       </div>
     </div>
   </div>
+);
+
+const NoCommentsFound = () => (
+  <p className="GithubIssueComments-no-comments-found">
+    No comments found{" "}
+    <span role="img" aria-label="Smiley Face Emoji">
+      🙁
+    </span>
+  </p>
+);
+
+const NewCommentButton = ({ redirectUrl }) => (
+  <a
+    className="GithubIssueComments-new-comment-button"
+    href={redirectUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Write a Comment via Github
+  </a>
+);
+
+const LoadingComments = () => (
+  <section className="GithubIssueComments-container">
+    <div className="GithubIssueComments-loading-icon"></div>
+  </section>
 );
 
 export default GithubIssueComments;
