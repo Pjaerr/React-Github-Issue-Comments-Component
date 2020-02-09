@@ -13,7 +13,7 @@ import "./GithubIssueComments.css";
  * @param {boolean} useShowCommentsPrompt Should the comments (and their network request) be hidden behind a
  * "Show Comments" button
  */
-const GithubIssueComments = ({ issueUri, useShowCommentsPrompt }) => {
+const GithubIssueComments = ({ issueUri, useShowCommentsPrompt = true }) => {
   const [showComments, setShowComments] = useState(!useShowCommentsPrompt);
 
   return (
@@ -98,7 +98,12 @@ const GithubIssueCommentsCore = ({ issueUri }) => {
 };
 
 const NoCommentsFound = () => (
-  <p className="GithubIssueComments-no-comments-found">No comments found 🙁</p>
+  <p className="GithubIssueComments-no-comments-found">
+    No comments found{" "}
+    <span role="img" aria-label="Smiley Face Emoji">
+      🙁
+    </span>
+  </p>
 );
 
 const NewCommentButton = ({ redirectUrl }) => (

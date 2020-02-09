@@ -5,13 +5,10 @@ import "./index.css";
 
 import GithubIssueComments from "./GithubIssueComments/GithubIssueComments";
 
-const App = () => (
-  <div style={{ width: "100%" }}>
-    <GithubIssueComments
-      issueUri="vuejs/vue/issues/7088"
-      useShowCommentsPrompt={true}
-    />
-  </div>
+ReactDOM.render(
+  <GithubIssueComments
+    issueUri="pjaerr/React-Github-Issue-Comments-Component/issues/2"
+    useShowCommentsPrompt={true}
+  />,
+  document.getElementById("root")
 );
-
-ReactDOM.render(<App />, document.getElementById("root"));
