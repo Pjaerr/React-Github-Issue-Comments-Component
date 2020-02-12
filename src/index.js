@@ -7,8 +7,8 @@ import GithubIssueComments from "./GithubIssueComments/GithubIssueComments";
 
 ReactDOM.render(
   <GithubIssueComments
-    issueUri="pjaerr/React-Github-Issue-Comments-Component/issues/2"
-    useShowCommentsPrompt={true}
+    issueUri="sveltejs/svelte/issues/2546"
+    useShowCommentsButton={true}
     commentsPerPage={5}
     allowRefreshingComments={true}
   />,

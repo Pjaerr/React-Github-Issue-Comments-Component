@@ -59,66 +59,69 @@ const GithubIssueCommentsCore = ({
   const loadComments = () => {
     /*Make a GET request to the github API for comments at the provided IssueUri. Request that
     the comment body be formatted as HTML.*/
-    fetch(`https://api.github.com/repos/${issueUri}/comments`, {
-      method: "GET",
-      headers: {
-        Accept: "application/vnd.github.v3.html+json"
-      }
-    })
-      .then(res => {
-        return res.json();
+    if (window.fetch !== undefined) {
+      fetch(`https://api.github.com/repos/${issueUri}/comments`, {
+        method: "GET",
+        headers: {
+          Accept: "application/vnd.github.v3.html+json"
+        }
       })
-      .then(data => {
-        //If the provided Github Issue exists
-        if (!data.message) {
-          //If no comment per page limit has been set, show all comments on one page
-          if (!commentsPerPage) {
-            commentsPerPage = data.length;
-          }
+        .then(res => {
+          return res.json();
+        })
+        .then(data => {
+          //If the provided Github Issue exists
+          if (!data.message) {
+            data = data.reverse();
 
-          //Organise comments into pages
-          const commentPages = []; //The array of all page arrays
-          let page = []; //The current page
+            //If no comment per page limit has been set, show all comments on one page
+            if (!commentsPerPage) {
+              commentsPerPage = data.length;
+            }
 
-          let currentComment = 0;
+            //Organise comments into pages
+            const commentPages = []; //The array of all page arrays
+            let page = []; //The current page
 
-          /*For each comment, push it to an array, and if the array reaches the size of
+            let currentComment = 0;
+
+            /*For each comment, push it to an array, and if the array reaches the size of
           commentsPerPage push the array into the commentPages array and start a new array 
           until all comments have been allocated to page arrays.*/
-          for (const comment of data) {
-            page.push({
-              body: { __html: comment["body_html"] },
-              user: {
-                username: comment.user.login,
-                avatarUrl: comment.user["avatar_url"],
-                isRepositoryOwner: comment["author_association"] === "OWNER"
-              },
-              createdAt: comment["created_at"]
-            });
+            for (const comment of data) {
+              page.push({
+                body: { __html: comment["body_html"] },
+                user: {
+                  username: comment.user.login,
+                  avatarUrl: comment.user["avatar_url"],
+                  isRepositoryOwner: comment["author_association"] === "OWNER"
+                },
+                createdAt: comment["created_at"]
+              });
 
-            //If we've reached the maximum number of comments in a page
-            if (currentComment === commentsPerPage - 1) {
-              commentPages.push(page);
-              page = [];
-              currentComment = 0;
-            } else {
-              currentComment++;
+              //If we've reached the maximum number of comments in a page
+              if (currentComment === commentsPerPage - 1) {
+                commentPages.push(page);
+                page = [];
+                currentComment = 0;
+              } else {
+                currentComment++;
+              }
             }
-          }
 
-          //If we've run out of comments but not met our commentsPerPage limit,
-          //Push the last page to the array of pages
-          if (page.length > 0) {
-            commentPages.push(page);
-          }
+            //If we've run out of comments but not met our commentsPerPage limit,
+            //Push the last page to the array of pages
+            if (page.length > 0) {
+              commentPages.push(page);
+            }
 
-          setComments(commentPages);
-          setCommentsHaveLoaded(true);
-          setCurrentPage(commentPages.length - 1);
-        } else {
-          console.error(`The issueUri: "${issueUri}" doesn't exist`);
-        }
-      });
+            setComments(commentPages);
+            setCommentsHaveLoaded(true);
+          } else {
+            console.error(`The issueUri: "${issueUri}" doesn't exist`);
+          }
+        });
+    }
   };
 
   useEffect(loadComments, [issueUri]);
