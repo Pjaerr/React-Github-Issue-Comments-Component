@@ -1,4 +1,4 @@
-/*Container*/
+/*Component Container*/
 .GithubIssueComments-container {
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   }
 }
 
-/*Comment*/
+/*Comment Container*/
 .GithubIssueComments-comment {
   display: flex;
   flex-direction: row;
@@ -204,4 +204,28 @@ code {
   text-decoration: none;
   transition: opacity 0.2s ease-in-out;
   opacity: 0.2;
+}
+
+/*Pagination*/
+.GithubIssueComments-pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+}
+
+.GithubIssueComments-pagination-button {
+  border: none;
+  background: none;
+  color: #586069;
+  margin-bottom: 0.5rem;
+}
+
+.GithubIssueComments-pagination-button:hover {
+  cursor: pointer;
+}
+
+.GithubIssueComments-pagination-button-active {
+  text-decoration: underline;
+  font-weight: bold;
 }
