@@ -18,13 +18,13 @@ It essentially recreates the github issues feed for a given issue.
 
 You will need atleast version `16.8` of React as this component makes use of Hooks.
 
-Firstly, grab the `GithubIssueComments` folder from the `src` folder and put it in your project wherever your components live and then import it onto your page. Example usage and the props the component takes are shown below:
+Firstly, grab the `GithubIssueComments` folder from the `src` folder and put it in your project wherever your components live and then import it when you want to use it. Example usage and the props the component takes are shown below:
 
 **Example Usage**
 ```jsx
 <GithubIssueComments
     issueUri="sveltejs/svelte/issues/2546"
-    useShowCommentsPrompt={true}
+    useShowCommentsButton={true}
     commentsPerPage={5}
     allowRefreshingComments={true}
   />
