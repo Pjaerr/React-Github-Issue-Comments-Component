@@ -16,7 +16,7 @@ It essentially recreates the github issues feed for a given issue.
 
 ## Usage
 
-You will need atleast version `` of React as this component makes use of Hooks.
+You will need atleast version `16.8` of React as this component makes use of Hooks.
 
 Firstly, grab the `GithubIssueComments` folder from the `src` folder and put it in your project wherever your components live and then import it onto your page. Example usage and the props the component takes are shown below:
 
