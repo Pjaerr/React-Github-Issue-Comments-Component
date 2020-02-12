@@ -39,6 +39,8 @@ Firstly, grab the `GithubIssueComments` folder from the `src` folder and put it 
 |commentsPerPage|`number` (optional)|How many comments should be shown per page, will show pagination if there is more than 1 page and will show all comments at once if no value is provided.|
 |allowRefreshingComments|`boolean` (optional)|Should the user be shown a "Check for new comments" button? True if no value is provided.|
 
+You can also see a live example at the bottom of my blogposts:  https://joshuaj.co.uk/blog/lets-create-data-vis-svelte
+
 ## Using with Gatsby
 It's quite simple, add this component to your blog post template and then just add an extra field to your blog posts frontmatter for an issue link and then pull it into your template using a graphql query.
 
