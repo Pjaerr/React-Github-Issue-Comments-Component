@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import "./GithubIssueComments.css";
+import "./index.css";
 
 /**
  * Utilise an existing Github Issue as a comment thread
@@ -10,20 +10,23 @@ import "./GithubIssueComments.css";
  * @param {string} issueUri The URI of the github issue you want to load comments from.
  * Using the following structure: `USER/REPOSITORY_NAME/issues/ISSUE_NUMBER`.
  *
- * @param {boolean} [useShowCommentsButton] Should the comments (and their network request) be hidden behind a
+ * @param {boolean} useShowCommentsButton Should the comments (and their network request) be hidden behind a
  * "Show Comments" button. True if no value is provided.
  *
- * @param {number} [commentsPerPage] How many comments should be shown per page, will show pagination if there
+ * @param {number} commentsPerPage How many comments should be shown per page, will show pagination if there
  * is more than 1 page and will show all comments on a single page if no value is provided.
  *
- * @param {boolean} [allowRefreshingComments] Should the user be shown a "Check for new comments" button? True if
+ * @param {boolean} allowRefreshingComments Should the user be shown a "Check for new comments" button? True if
  * no value is provided.
+ *
+ * @param {'asc' | 'desc'}  direction How should the comments be ordered (descending or ascending)
  */
 const GithubIssueComments = ({
   issueUri,
   useShowCommentsButton = true,
   allowRefreshingComments = true,
-  commentsPerPage
+  commentsPerPage,
+  direction = "desc",
 }) => {
   const [showComments, setShowComments] = useState(!useShowCommentsButton);
 
@@ -34,6 +37,7 @@ const GithubIssueComments = ({
           issueUri={issueUri}
           commentsPerPage={commentsPerPage}
           allowRefreshingComments={allowRefreshingComments}
+          direction={direction}
         />
       ) : (
         <button
@@ -49,8 +53,9 @@ const GithubIssueComments = ({
 
 const GithubIssueCommentsCore = ({
   issueUri,
+  allowRefreshingComments,
   commentsPerPage,
-  allowRefreshingComments
+  direction,
 }) => {
   const [comments, setComments] = useState([]);
   const [commentsHaveLoaded, setCommentsHaveLoaded] = useState(false);
@@ -63,13 +68,15 @@ const GithubIssueCommentsCore = ({
       fetch(`https://api.github.com/repos/${issueUri}/comments`, {
         method: "GET",
         headers: {
-          Accept: "application/vnd.github.v3.html+json"
-        }
+          Accept: "application/vnd.github.v3.html+json",
+        },
       })
-        .then(res => {
+        .then((res) => {
           return res.json();
         })
-        .then(data => {
+        .then((data) => {
+          // TODO: Refactor to actually utilise pagination on the endpoint
+
           //If the provided Github Issue exists
           if (!data.message) {
             data = data.reverse();
@@ -86,7 +93,7 @@ const GithubIssueCommentsCore = ({
             let currentComment = 0;
 
             /*For each comment, push it to an array, and if the array reaches the size of
-          commentsPerPage push the array into the commentPages array and start a new array 
+          commentsPerPage push the array into the commentPages array and start a new array
           until all comments have been allocated to page arrays.*/
             for (const comment of data) {
               page.push({
@@ -94,9 +101,9 @@ const GithubIssueCommentsCore = ({
                 user: {
                   username: comment.user.login,
                   avatarUrl: comment.user["avatar_url"],
-                  isRepositoryOwner: comment["author_association"] === "OWNER"
+                  isRepositoryOwner: comment["author_association"] === "OWNER",
                 },
-                createdAt: comment["created_at"]
+                createdAt: comment["created_at"],
               });
 
               //If we've reached the maximum number of comments in a page
@@ -130,7 +137,7 @@ const GithubIssueCommentsCore = ({
     return (
       <>
         {comments.length > 0 && comments[currentPage] ? (
-          comments[currentPage].map(comment => (
+          comments[currentPage].map((comment) => (
             <Comment
               key={comment.user.username + "_" + comment.createdAt}
               body={comment.body}
@@ -145,7 +152,7 @@ const GithubIssueCommentsCore = ({
           <Pagination
             activePage={currentPage}
             numberOfPages={comments.length}
-            onPageChange={pageNumber => setCurrentPage(pageNumber)}
+            onPageChange={(pageNumber) => setCurrentPage(pageNumber)}
           />
         )}
 
