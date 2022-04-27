@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import "./index.css";
 
@@ -253,36 +253,56 @@ const RefreshCommentsButton = ({ onRefresh }: RefreshCommentsButtonProps) => {
   );
 };
 
-const Comment = ({ body, user, createdAt }: Comment) => (
-  <div className="GithubIssueComments-comment">
-    <a
-      className="GithubIssueComments-comment-user-avatar"
-      href={`https://github.com/${user.username}`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <img src={user.avatarUrl} alt={`Avatar of ${user.username}`} />
-    </a>
+const Comment = ({ body, user, createdAt }: Comment) => {
+  const contentElementSetup = useCallback((node: HTMLParagraphElement) => {
+    if (node !== null) {
+      const emailElements = [
+        node.querySelector(".email-hidden-toggle"),
+        node.querySelector(".email-hidden-reply"),
+      ];
 
-    <div className="GithubIssueComments-comment-box">
-      <div
-        className={
-          user.isRepositoryOwner
-            ? "GithubIssueComments-comment-box-header GithubIssueComments-comment-box-header-isOwner"
-            : "GithubIssueComments-comment-box-header"
+      emailElements.forEach((element) => {
+        if (element) {
+          node.removeChild(element);
         }
+      });
+    }
+  }, []);
+
+  return (
+    <div className="GithubIssueComments-comment">
+      <a
+        className="GithubIssueComments-comment-user-avatar"
+        href={`https://github.com/${user.username}`}
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        <b className="GithubIssueComments-comment-box-header-username">
-          {user.username}
-          <span> commented on {new Date(createdAt).toLocaleDateString()}</span>
-        </b>
-      </div>
-      <div className="GithubIssueComments-comment-box-body">
-        <p dangerouslySetInnerHTML={body}></p>
+        <img src={user.avatarUrl} alt={`Avatar of ${user.username}`} />
+      </a>
+
+      <div className="GithubIssueComments-comment-box">
+        <div
+          className={
+            user.isRepositoryOwner
+              ? "GithubIssueComments-comment-box-header GithubIssueComments-comment-box-header-isOwner"
+              : "GithubIssueComments-comment-box-header"
+          }
+        >
+          <b className="GithubIssueComments-comment-box-header-username">
+            {user.username}
+            <span>
+              {" "}
+              commented on {new Date(createdAt).toLocaleDateString()}
+            </span>
+          </b>
+        </div>
+        <div className="GithubIssueComments-comment-box-body">
+          <p ref={contentElementSetup} dangerouslySetInnerHTML={body}></p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const NoCommentsFound = () => (
   <p className="GithubIssueComments-no-comments-found">
