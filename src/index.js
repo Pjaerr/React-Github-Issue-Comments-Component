@@ -7,9 +7,9 @@ import GithubIssueComments from "./GithubIssueComments";
 
 ReactDOM.render(
   <GithubIssueComments
-    issueUri="Pjaerr/Svelte-Electron-Desktop-App/issues/1"
+    issueUri="emberjs/rfcs/issues/777"
     useShowCommentsButton={false}
-    commentsPerPage={5}
+    commentsPerPage={3}
     allowRefreshingComments={true}
     direction="asc"
   />,

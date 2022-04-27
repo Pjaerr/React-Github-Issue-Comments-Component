@@ -2,32 +2,31 @@ import React, { useEffect, useState } from "react";
 
 import "./index.css";
 
-/**
- * Utilise an existing Github Issue as a comment thread
- *
- * Props:
- * ---
- * @param {string} issueUri The URI of the github issue you want to load comments from.
- * Using the following structure: `USER/REPOSITORY_NAME/issues/ISSUE_NUMBER`.
- *
- * @param {boolean} useShowCommentsButton Should the comments (and their network request) be hidden behind a
- * "Show Comments" button. True if no value is provided.
- *
- * @param {number} commentsPerPage How many comments should be shown per page, will show pagination if there
- * is more than 1 page and will show all comments on a single page if no value is provided.
- *
- * @param {boolean} allowRefreshingComments Should the user be shown a "Check for new comments" button? True if
- * no value is provided.
- *
- * @param {'asc' | 'desc'}  direction How should the comments be ordered (descending or ascending)
- */
+interface Props {
+  /**
+   * The URI of the github issue you want to load comments from. Using the following structure: `USER/REPOSITORY_NAME/issues/ISSUE_NUMBER`
+   */
+  issueUri: string;
+  /**
+   * Should the comments (and their network request) be hidden behind a "Show Comments" button. True if no value is provided
+   */
+  useShowCommentsButton?: boolean;
+  /**
+   * How many comments should be shown per page, will show pagination if there is more than 1 page and will show 100 comments on a single page if no value is provided.
+   */
+  commentsPerPage?: number;
+  /**
+   * Should the user be shown a "Check for new comments" button? True if no value is provided.
+   */
+  allowRefreshingComments?: boolean;
+}
+
 const GithubIssueComments = ({
   issueUri,
   useShowCommentsButton = true,
   allowRefreshingComments = true,
-  commentsPerPage,
-  direction = "desc",
-}) => {
+  commentsPerPage = 100,
+}: Props) => {
   const [showComments, setShowComments] = useState(!useShowCommentsButton);
 
   return (
@@ -37,7 +36,6 @@ const GithubIssueComments = ({
           issueUri={issueUri}
           commentsPerPage={commentsPerPage}
           allowRefreshingComments={allowRefreshingComments}
-          direction={direction}
         />
       ) : (
         <button
@@ -51,52 +49,95 @@ const GithubIssueComments = ({
   );
 };
 
+interface Comment {
+  body: { __html: string };
+  user: { username: string; avatarUrl: string; isRepositoryOwner: boolean };
+  createdAt: string;
+}
+
+interface PaginationHeaders {
+  next: number | undefined;
+  previous: number | undefined;
+  first: number | undefined;
+  last: number | undefined;
+}
+
+const parseLinkHeaders = (link: string): PaginationHeaders => {
+  const links = link.split(",").map((l: string) => {
+    let page;
+
+    const pageAsString = l.match(/\?\page=./g)?.[0].replace("?page=", "");
+
+    if (pageAsString) {
+      page = parseInt(pageAsString, 10);
+    }
+
+    const rel = /rel=".*"/g.exec(l)?.[0].replace('rel="', "").replace('"', "");
+
+    return {
+      rel,
+      page,
+    };
+  });
+
+  const next = links.find(({ rel }) => rel === "next")?.page;
+  const previous = links.find(({ rel }) => rel === "previous")?.page;
+  const first = links.find(({ rel }) => rel === "first")?.page;
+  const last = links.find(({ rel }) => rel === "last")?.page;
+
+  return {
+    next,
+    previous,
+    first,
+    last,
+  };
+};
+
 const GithubIssueCommentsCore = ({
   issueUri,
   allowRefreshingComments,
   commentsPerPage,
-  direction,
-}) => {
-  const [comments, setComments] = useState([]);
+}: Props) => {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentsHaveLoaded, setCommentsHaveLoaded] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+
+  const [paginationHeaders, setPaginationHeaders] =
+    useState<PaginationHeaders | null>(null);
+
+  const [page, setPage] = useState(1);
 
   const loadComments = () => {
-    /*Make a GET request to the github API for comments at the provided IssueUri. Request that
-    the comment body be formatted as HTML.*/
     if (window.fetch !== undefined) {
-      fetch(`https://api.github.com/repos/${issueUri}/comments`, {
-        method: "GET",
-        headers: {
-          Accept: "application/vnd.github.v3.html+json",
-        },
-      })
+      setCommentsHaveLoaded(false);
+
+      fetch(
+        `https://api.github.com/repos/${issueUri}/comments?page=${page}&per_page=${commentsPerPage}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/vnd.github.v3.html+json",
+          },
+        }
+      )
         .then((res) => {
+          const link = res.headers.get("link");
+
+          if (link) {
+            setPaginationHeaders(parseLinkHeaders(link));
+          }
+
           return res.json();
         })
         .then((data) => {
-          // TODO: Refactor to actually utilise pagination on the endpoint
+          if (data.message === "Not Found") {
+            console.error(`The issueUri: "${issueUri}" doesn't exist`);
+          } else if (data.message) {
+            console.error(data.message);
+          } else {
+            const allComments: Comment[] = [];
 
-          //If the provided Github Issue exists
-          if (!data.message) {
-            data = data.reverse();
-
-            //If no comment per page limit has been set, show all comments on one page
-            if (!commentsPerPage) {
-              commentsPerPage = data.length;
-            }
-
-            //Organise comments into pages
-            const commentPages = []; //The array of all page arrays
-            let page = []; //The current page
-
-            let currentComment = 0;
-
-            /*For each comment, push it to an array, and if the array reaches the size of
-          commentsPerPage push the array into the commentPages array and start a new array
-          until all comments have been allocated to page arrays.*/
             for (const comment of data) {
-              page.push({
+              allComments.push({
                 body: { __html: comment["body_html"] },
                 user: {
                   username: comment.user.login,
@@ -105,39 +146,22 @@ const GithubIssueCommentsCore = ({
                 },
                 createdAt: comment["created_at"],
               });
-
-              //If we've reached the maximum number of comments in a page
-              if (currentComment === commentsPerPage - 1) {
-                commentPages.push(page);
-                page = [];
-                currentComment = 0;
-              } else {
-                currentComment++;
-              }
             }
 
-            //If we've run out of comments but not met our commentsPerPage limit,
-            //Push the last page to the array of pages
-            if (page.length > 0) {
-              commentPages.push(page);
-            }
-
-            setComments(commentPages);
+            setComments(allComments);
             setCommentsHaveLoaded(true);
-          } else {
-            console.error(`The issueUri: "${issueUri}" doesn't exist`);
           }
         });
     }
   };
 
-  useEffect(loadComments, [issueUri]);
+  useEffect(loadComments, [issueUri, page]);
 
   if (commentsHaveLoaded) {
     return (
       <>
-        {comments.length > 0 && comments[currentPage] ? (
-          comments[currentPage].map((comment) => (
+        {comments.length > 0 ? (
+          comments.map((comment) => (
             <Comment
               key={comment.user.username + "_" + comment.createdAt}
               body={comment.body}
@@ -148,11 +172,14 @@ const GithubIssueCommentsCore = ({
         ) : (
           <NoCommentsFound />
         )}
-        {comments.length > 1 && (
+
+        {paginationHeaders && (
           <Pagination
-            activePage={currentPage}
-            numberOfPages={comments.length}
-            onPageChange={(pageNumber) => setCurrentPage(pageNumber)}
+            activePage={page}
+            numberOfPages={
+              paginationHeaders?.last ? paginationHeaders.last : page
+            }
+            onPageChange={(pageNumber) => setPage(pageNumber)}
           />
         )}
 
@@ -170,19 +197,20 @@ const GithubIssueCommentsCore = ({
   return <LoadingComments />;
 };
 
-/**
- *
- * @param {number} activePage Which button should be shown as active (0 based index).
- *
- * @param {number} numberOfPages How many buttons should be shown.
- *
- * @param {(pageNumber: number) => void} onPageChange Called when a button is pressed, passes argument
- * set to the index of the button pressed.
- */
-const Pagination = ({ activePage, numberOfPages, onPageChange }) => {
+interface PaginationProps {
+  activePage: number;
+  numberOfPages: number;
+  onPageChange: (newPage: number) => void;
+}
+
+const Pagination = ({
+  activePage,
+  numberOfPages,
+  onPageChange,
+}: PaginationProps) => {
   const buttons = [];
 
-  for (let i = 0; i < numberOfPages; i++) {
+  for (let i = 1; i <= numberOfPages; ++i) {
     buttons.push(
       <button
         key={i}
@@ -195,7 +223,7 @@ const Pagination = ({ activePage, numberOfPages, onPageChange }) => {
           onPageChange(i);
         }}
       >
-        {i + 1}
+        {i}
       </button>
     );
   }
@@ -203,12 +231,11 @@ const Pagination = ({ activePage, numberOfPages, onPageChange }) => {
   return <div className="GithubIssueComments-pagination">{buttons}</div>;
 };
 
-/**
- * Button component that calls a given `onRefresh()` function and disables itself for 1 second between
- * button clicks to avoid spamming the button.
- * @param {() => void} onRefresh
- */
-const RefreshCommentsButton = ({ onRefresh }) => {
+interface RefreshCommentsButtonProps {
+  onRefresh: () => void;
+}
+
+const RefreshCommentsButton = ({ onRefresh }: RefreshCommentsButtonProps) => {
   const [allowCommentsRefresh, setAllowCommentsRefresh] = useState(false);
 
   return (
@@ -226,7 +253,7 @@ const RefreshCommentsButton = ({ onRefresh }) => {
   );
 };
 
-const Comment = ({ body, user, createdAt }) => (
+const Comment = ({ body, user, createdAt }: Comment) => (
   <div className="GithubIssueComments-comment">
     <a
       className="GithubIssueComments-comment-user-avatar"
@@ -266,7 +293,11 @@ const NoCommentsFound = () => (
   </p>
 );
 
-const NewCommentButton = ({ redirectUrl }) => (
+interface NewCommentButtonProps {
+  redirectUrl: string;
+}
+
+const NewCommentButton = ({ redirectUrl }: NewCommentButtonProps) => (
   <a
     className="GithubIssueComments-new-comment-button"
     href={redirectUrl}
