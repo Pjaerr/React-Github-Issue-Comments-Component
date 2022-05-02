@@ -30,7 +30,7 @@ const GithubIssueComments = ({
   const [showComments, setShowComments] = useState(!useShowCommentsButton);
 
   return (
-    <section className="GithubIssueComments-container">
+    <section className="github-issue-comments">
       {showComments ? (
         <GithubIssueCommentsCore
           issueUri={issueUri}
@@ -39,7 +39,7 @@ const GithubIssueComments = ({
         />
       ) : (
         <button
-          className="GithubIssueComments-show-comments-button"
+          className="github-issue-comments__show-comments-button"
           onClick={() => setShowComments(true)}
         >
           Show Comments
@@ -157,44 +157,52 @@ const GithubIssueCommentsCore = ({
 
   useEffect(loadComments, [issueUri, page]);
 
-  if (commentsHaveLoaded) {
-    return (
-      <>
-        {comments.length > 0 ? (
-          comments.map((comment) => (
-            <Comment
-              key={comment.user.username + "_" + comment.createdAt}
-              body={comment.body}
-              user={comment.user}
-              createdAt={comment.createdAt}
+  const commentsMarkup = () => {
+    if (commentsHaveLoaded) {
+      return (
+        <>
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <Comment
+                key={comment.user.username + "_" + comment.createdAt}
+                body={comment.body}
+                user={comment.user}
+                createdAt={comment.createdAt}
+              />
+            ))
+          ) : (
+            <NoCommentsFound />
+          )}
+
+          {paginationHeaders && (
+            <Pagination
+              activePage={page}
+              numberOfPages={
+                paginationHeaders?.last ? paginationHeaders.last : page
+              }
+              onPageChange={(pageNumber) => setPage(pageNumber)}
             />
-          ))
-        ) : (
-          <NoCommentsFound />
-        )}
+          )}
+        </>
+      );
+    }
 
-        {paginationHeaders && (
-          <Pagination
-            activePage={page}
-            numberOfPages={
-              paginationHeaders?.last ? paginationHeaders.last : page
-            }
-            onPageChange={(pageNumber) => setPage(pageNumber)}
-          />
-        )}
+    return <LoadingComments />;
+  };
 
-        {allowRefreshingComments && (
-          <RefreshCommentsButton onRefresh={loadComments} />
-        )}
+  return (
+    <>
+      {commentsMarkup()}
 
-        <NewCommentButton
-          redirectUrl={`https://github.com/${issueUri}#issue-comment-box`}
-        />
-      </>
-    );
-  }
+      {allowRefreshingComments && (
+        <RefreshCommentsButton onRefresh={loadComments} />
+      )}
 
-  return <LoadingComments />;
+      <NewCommentButton
+        redirectUrl={`https://github.com/${issueUri}#issue-comment-box`}
+      />
+    </>
+  );
 };
 
 interface PaginationProps {
@@ -216,8 +224,8 @@ const Pagination = ({
         key={i}
         className={
           activePage === i
-            ? "GithubIssueComments-pagination-button GithubIssueComments-pagination-button-active"
-            : "GithubIssueComments-pagination-button"
+            ? "github-issue-comments__pagination-button github-issue-comments__pagination-button-active"
+            : "github-issue-comments__pagination-button"
         }
         onClick={() => {
           onPageChange(i);
@@ -228,7 +236,7 @@ const Pagination = ({
     );
   }
 
-  return <div className="GithubIssueComments-pagination">{buttons}</div>;
+  return <div className="github-issue-comments__pagination">{buttons}</div>;
 };
 
 interface RefreshCommentsButtonProps {
@@ -240,7 +248,7 @@ const RefreshCommentsButton = ({ onRefresh }: RefreshCommentsButtonProps) => {
 
   return (
     <button
-      className="GithubIssueComments-refresh-comments-button"
+      className="github-issue-comments__refresh-comments-button"
       disabled={allowCommentsRefresh}
       onClick={() => {
         setAllowCommentsRefresh(true);
@@ -270,9 +278,9 @@ const Comment = ({ body, user, createdAt }: Comment) => {
   }, []);
 
   return (
-    <div className="GithubIssueComments-comment">
+    <div className="github-issue-comments__comment">
       <a
-        className="GithubIssueComments-comment-user-avatar"
+        className="github-issue-comments__comment-user-avatar"
         href={`https://github.com/${user.username}`}
         target="_blank"
         rel="noopener noreferrer"
@@ -280,15 +288,15 @@ const Comment = ({ body, user, createdAt }: Comment) => {
         <img src={user.avatarUrl} alt={`Avatar of ${user.username}`} />
       </a>
 
-      <div className="GithubIssueComments-comment-box">
+      <div className="github-issue-comments__comment-box">
         <div
           className={
             user.isRepositoryOwner
-              ? "GithubIssueComments-comment-box-header GithubIssueComments-comment-box-header-isOwner"
-              : "GithubIssueComments-comment-box-header"
+              ? "github-issue-comments__comment-box-header github-issue-comments__comment-box-header--is-owner"
+              : "github-issue-comments__comment-box-header"
           }
         >
-          <b className="GithubIssueComments-comment-box-header-username">
+          <b className="github-issue-comments__comment-box-header-username">
             {user.username}
             <span>
               {" "}
@@ -296,7 +304,7 @@ const Comment = ({ body, user, createdAt }: Comment) => {
             </span>
           </b>
         </div>
-        <div className="GithubIssueComments-comment-box-body">
+        <div className="github-issue-comments__comment-box-body">
           <p ref={contentElementSetup} dangerouslySetInnerHTML={body}></p>
         </div>
       </div>
@@ -305,7 +313,7 @@ const Comment = ({ body, user, createdAt }: Comment) => {
 };
 
 const NoCommentsFound = () => (
-  <p className="GithubIssueComments-no-comments-found">
+  <p className="github-issue-comments__no-comments-found">
     No comments found{" "}
     <span role="img" aria-label="Smiley Face Emoji">
       🙁
@@ -319,7 +327,7 @@ interface NewCommentButtonProps {
 
 const NewCommentButton = ({ redirectUrl }: NewCommentButtonProps) => (
   <a
-    className="GithubIssueComments-new-comment-button"
+    className="github-issue-comments__new-comment-button"
     href={redirectUrl}
     target="_blank"
     rel="noopener noreferrer"
@@ -329,8 +337,8 @@ const NewCommentButton = ({ redirectUrl }: NewCommentButtonProps) => (
 );
 
 const LoadingComments = () => (
-  <section className="GithubIssueComments-container">
-    <div className="GithubIssueComments-loading-icon"></div>
+  <section className="github-issue-comments">
+    <div className="github-issue-comments__loading-icon"></div>
   </section>
 );
 

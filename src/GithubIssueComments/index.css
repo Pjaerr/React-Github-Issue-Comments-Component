@@ -1,125 +1,140 @@
 /*Component Container*/
-.GithubIssueComments-container {
+.github-issue-comments {
   display: flex;
   flex-direction: column;
   width: 100%;
-  font-size: 0.8em;
-}
 
-@media (min-width: 480px) {
-  .GithubIssueComments-container {
-    font-size: 1em;
-  }
+  --github-issue-comments-comment-spacing: 10px;
+  --github-issue-comments-avatar-size: 32px;
+  --github-issue-comments-text-color: #24292e;
+  --github-issue-comments-header-background-color: #f6f8fa;
+  --github-issue-comments-header-owner-background-color: #f1f8ff;
+  --github-issue-comments-body-background-color: #ffffff;
+  --github-issue-comments-border-color: rgba(149, 157, 165, 0.5);
+  --github-issue-comments-header-commented-date-text-color: #586069;
+
+  --github-issue-comments-blockquote-text-color: #6a737d;
+  --github-issue-comments-blockquote-border-color: #dfe2e5;
+
+  --github-issue-comments-new-comment-button-background-color: #28a745;
+  --github-issue-comments-new-comment-button-text-color: #ffffff;
+  --github-issue-comments-new-comment-button-width: 180px;
+  --github-issue-comments-new-comment-button-height: 40px;
+
+  --github-issue-comments-show-comments-button-width: 180px;
+  --github-issue-comments-show-comments-button-height: 40px;
+
+  --github-issue-comments-loading-icon-background-color: #6a737d;
+
+  --github-issue-comments-show-comments-button-background-color: #ffffff;
+  --github-issue-comments-show-comments-button-text-color: #586069;
+
+  --github-issue-comments-meta-button-text-color: #586069;
 }
 
 /*Comment Container*/
-.GithubIssueComments-comment {
+.github-issue-comments__comment {
   display: flex;
   flex-direction: row;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: var(--github-issue-comments-comment-spacing);
+  margin-bottom: var(--github-issue-comments-comment-spacing);
 }
 
 /*Comment Profile Avatar*/
-.GithubIssueComments-comment-user-avatar {
-  width: 20px;
-  height: 20px;
+.github-issue-comments__comment-user-avatar {
+  max-width: var(--github-issue-comments-avatar-size);
+  max-height: var(--github-issue-comments-avatar-size);
   margin-right: 5px;
 }
 
-@media (min-width: 480px) {
-  .GithubIssueComments-comment-user-avatar {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-  }
-}
-
-.GithubIssueComments-comment-user-avatar > img {
+.github-issue-comments__comment-user-avatar > img {
   width: 100%;
   height: 100%;
   border-radius: 3px;
 }
 
 /*Comment Box*/
-.GithubIssueComments-comment-box {
-  border: 1px solid rgba(149, 157, 165, 0.5);
+.github-issue-comments__comment-box {
+  border: 1px solid var(--github-issue-comments-border-color);
   border-radius: 3px;
-  color: #24292e;
+  color: var(--github-issue-comments-text-color);
   width: 100%;
   overflow: hidden;
 }
 
 /*Comment Box Header*/
-.GithubIssueComments-comment-box-header {
-  border-bottom: 1px solid rgba(149, 157, 165, 0.5);
-  background-color: #f6f8fa;
-  height: 34px;
+.github-issue-comments__comment-box-header {
+  border-bottom: 1px solid var(--github-issue-comments-border-color);
+  background-color: var(--github-issue-comments-header-background-color);
+  height: 32px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 0.5rem;
+  padding: 8px;
 }
 
-.GithubIssueComments-comment-box-header-isOwner {
-  background-color: #f1f8ff;
+.github-issue-comments__comment-box-header--is-owner {
+  background-color: var(--github-issue-comments-header-owner-background-color);
 }
 
-.GithubIssueComments-comment-box-header-username {
+.github-issue-comments__comment-box-header-username {
   font-weight: bold;
 }
 
-.GithubIssueComments-comment-box-header-username > span {
+.github-issue-comments__comment-box-header-username > span {
   font-weight: normal;
-  color: #586069;
+  color: var(--github-issue-comments-header-commented-date-text-color);
 }
 
 /*Comment Box Body*/
-.GithubIssueComments-comment-box-body {
-  background-color: #ffffff;
-  padding: 0.8rem;
+.github-issue-comments__comment-box-body {
+  background-color: var(--github-issue-comments-body-background-color);
+  padding: 14px;
 }
 
-.GithubIssueComments-comment-box-body > p {
+.github-issue-comments__comment-box-body > p {
   overflow-wrap: break-word;
 }
 
-.GithubIssueComments-comment-box-body > p > blockquote {
+.github-issue-comments__comment-box-body > p > blockquote {
   margin: 0;
   padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5;
+  color: var(--github-issue-comments-blockquote-text-color);
+  border-left: 0.25em solid var(--github-issue-comments-blockquote-border-color);
 }
 
-.GithubIssueComments-comment-box-body > p pre,
+.github-issue-comments__comment-box-body > p pre,
 code {
   overflow-x: auto;
 }
 
 /*Comment Button*/
-.GithubIssueComments-new-comment-button {
+.github-issue-comments__new-comment-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 12rem;
-  min-height: 2.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  /*TODO: Use px for these widths*/
+  min-width: var(--github-issue-comments-new-comment-button-width);
+  min-height: var(--github-issue-comments-new-comment-button-height);
+  padding-left: 8px;
+  padding-right: 8px;
   margin: 0 auto;
-  margin-top: 10px;
+  margin-top: var(--github-issue-comments-comment-spacing);
   border-radius: 3px;
-  background-color: #28a745;
-  color: #ffffff;
+  background-color: var(
+    --github-issue-comments-new-comment-button-background-color
+  );
+  color: var(--github-issue-comments-new-comment-button-text-color);
   text-align: center;
   font-weight: bold;
   text-decoration: none;
 }
 
 /*Loading Icon Animation*/
-.GithubIssueComments-loading-icon {
+.github-issue-comments__loading-icon {
   width: 40px;
   height: 40px;
-  background-color: #6a737d;
+  background-color: var(--github-issue-comments-loading-icon-background-color);
   margin: 0 auto;
   margin-top: 30px;
   -webkit-animation: sk-rotateplane 1.5s infinite ease-in-out;
@@ -154,78 +169,81 @@ code {
 }
 
 /*No Comments Found*/
-.GithubIssueComments-no-comments-found {
+.github-issue-comments__no-comments-found {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 16px;
 }
 
 /*Show Comments Button*/
-.GithubIssueComments-show-comments-button {
+.github-issue-comments__show-comments-button {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  width: 12rem;
-  height: 2.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  border: 1px solid #586069;
+  width: var(--github-issue-comments-show-comments-button-width);
+  height: var(--github-issue-comments-show-comments-button-height);
+  padding-left: 8px;
+  padding-right: 8px;
+  border: 1px solid var(--github-issue-comments-show-comments-button-text-color);
   border-radius: 3px;
-  background-color: #fff;
-  color: #586069;
+  background-color: var(
+    --github-issue-comments-show-comments-button-background-color
+  );
+  color: var(--github-issue-comments-show-comments-button-text-color);
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.GithubIssueComments-show-comments-button:hover {
-  background-color: #586069;
-  color: #fff;
+.github-issue-comments__show-comments-button:hover {
+  background-color: var(
+    --github-issue-comments-show-comments-button-text-color
+  );
+  color: var(--github-issue-comments-show-comments-button-background-color);
 }
 
 /*Refresh Comments Button*/
-.GithubIssueComments-refresh-comments-button {
+.github-issue-comments__refresh-comments-button {
   border: none;
   background: none;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #586069;
+  color: var(--github-issue-comments-meta-button-text-color);
   text-decoration: underline;
-  font-size: 0.8em;
+  padding: 16px;
 }
 
-.GithubIssueComments-refresh-comments-button:hover {
+.github-issue-comments__refresh-comments-button:hover {
   cursor: pointer;
 }
 
-.GithubIssueComments-refresh-comments-button:disabled {
+.github-issue-comments__refresh-comments-button:disabled {
   text-decoration: none;
   transition: opacity 0.2s ease-in-out;
   opacity: 0.2;
 }
 
 /*Pagination*/
-.GithubIssueComments-pagination {
+.github-issue-comments__pagination {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  padding: 1rem;
+  padding: 18px;
 }
 
-.GithubIssueComments-pagination-button {
+.github-issue-comments__pagination-button {
   border: none;
   background: none;
-  color: #586069;
-  margin-bottom: 0.5rem;
+  color: var(--github-issue-comments-meta-button-text-color);
 }
 
-.GithubIssueComments-pagination-button:hover {
+.github-issue-comments__pagination-button:hover {
   cursor: pointer;
 }
 
-.GithubIssueComments-pagination-button-active {
+.github-issue-comments__pagination-button-active {
   text-decoration: underline;
   font-weight: bold;
 }
