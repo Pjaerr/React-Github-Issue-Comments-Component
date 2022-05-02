@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import "./index.css";
+require("./index.css");
 
 interface Props {
   /**
