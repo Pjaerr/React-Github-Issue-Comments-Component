@@ -3,14 +3,15 @@ import ReactDOM from "react-dom";
 
 import "./index.css";
 
-import GithubIssueComments from "./GithubIssueComments/GithubIssueComments";
+import GithubIssueComments from "./GithubIssueComments";
 
 ReactDOM.render(
   <GithubIssueComments
-    issueUri="sveltejs/svelte/issues/2546"
-    useShowCommentsButton={true}
-    commentsPerPage={5}
+    issueUri="emberjs/rfcs/issues/777"
+    useShowCommentsButton={false}
+    commentsPerPage={3}
     allowRefreshingComments={true}
+    direction="asc"
   />,
   document.getElementById("root")
 );
