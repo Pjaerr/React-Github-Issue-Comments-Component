@@ -40,13 +40,13 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "rollup": "^2.71.1",
-    "rollup-plugin-dts": "^4.2.1",
-    "rollup-plugin-import-css": "^3.0.3"
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-dts": "^4.2.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "files": [
     "dist"
   ],
-  "types": "dist/types/index.d.ts"
+  "types": "dist/index.d.ts"
 }

@@ -2272,8 +2272,6 @@ function requireReact_development () {
 
 var React = /*@__PURE__*/getDefaultExportFromCjs(react.exports);
 
-// import "./index.css";
-require("./index.css");
 var GithubIssueComments = function (_a) {
     var issueUri = _a.issueUri, _b = _a.useShowCommentsButton, useShowCommentsButton = _b === void 0 ? true : _b, _c = _a.allowRefreshingComments, allowRefreshingComments = _c === void 0 ? true : _c, _d = _a.commentsPerPage, commentsPerPage = _d === void 0 ? 100 : _d;
     var _e = react.exports.useState(!useShowCommentsButton), showComments = _e[0], setShowComments = _e[1];

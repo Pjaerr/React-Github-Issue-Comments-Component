@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-require("./index.css");
-
 interface Props {
   /**
    * The URI of the github issue you want to load comments from. Using the following structure: `USER/REPOSITORY_NAME/issues/ISSUE_NUMBER`
