@@ -2,7 +2,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
-import css from "rollup-plugin-import-css";
+import copy from "rollup-plugin-copy";
 
 const packageJson = require("./package.json");
 
@@ -25,12 +25,16 @@ export default [
       resolve(),
       commonjs(),
       typescript({ tsconfig: "./tsconfig.json" }),
-      css(),
     ],
   },
   {
     input: "dist/esm/types/index.d.ts",
     output: [{ file: "dist/index.d.ts", format: "esm" }],
-    plugins: [dts()],
+    plugins: [
+      dts(),
+      copy({
+        targets: [{ src: "src/GithubIssueComments/index.css", dest: "dist" }],
+      }),
+    ],
   },
 ];
